@@ -1,16 +1,21 @@
 /* ------------------------------------------------------------------------- *
- * HL7 New Zealand FHIR IG theme.
+ * HL7 New Zealand palette.
+ *
+ * The 20 numbered variables are the standard theming hooks defined in
+ * fhir.base.template's content/assets/css/project.css. Their values are
+ * unchanged from the original nzBaseTemplate green scheme - this file is the
+ * single source of truth for HL7 NZ colour, and theme.css only ever refers to
+ * these tokens, never to raw hex.
  *
  * Loaded via includes/_append.fragment-css.html, which the IG publisher appends
  * to fhir.base.template's fragment-css.html. That fragment is included from
  * fragment-pagebegin.html *after* the base template's project.css and cqf.css,
- * so the custom property values below win the cascade.
- *
- * The numbered variables are the standard theming hooks defined in
- * fhir.base.template's content/assets/css/project.css.
+ * so these values win the cascade.
  * ------------------------------------------------------------------------- */
 
 :root {
+  /* --- standard fhir.base.template theming hooks ------------------------- */
+
   --ig-status-text-color: #006020; /* 1. IG Title and status text color */
   --navbar-bg-color: #206030; /* 2. Header container color */
   --footer-bg-color: #666e68; /* 3. Footer background color */
@@ -31,6 +36,34 @@
   --toc-box-border: 1px solid green; /* 18. TOC box border definition */
   --stu-note-background-color: #ffccbb; /* 19. (STU) Note box background color */
   --stu-note-border-left-color: #ff6020; /* 20. (STU) Note box border color */
+
+  /* --- HL7 NZ additions -------------------------------------------------- *
+   * Named aliases and neutrals used by theme.css. The greens are the palette
+   * values above restated under semantic names; the neutrals are desaturated
+   * greens rather than pure greys, so the whole page shares one hue family.  */
+
+  --nz-green-deep: #206030; /* navbar / footer container */
+  --nz-green-mid: #209966; /* primary accent, active states */
+  --nz-green-bright: #20b070; /* hover, highlights */
+  --nz-green-pale: #ddffee; /* tinted surfaces */
+
+  --nz-ink: #16211b; /* body text */
+  --nz-ink-muted: #5b6b62; /* secondary text, captions, breadcrumbs */
+  --nz-ink-faint: #8a978f; /* section numbers, disabled */
+
+  --nz-surface: #f5f9f7; /* cards, code blocks, striped rows */
+  --nz-surface-sunken: #eef4f1; /* table headers */
+  --nz-rule: #dde7e2; /* hairlines */
+  --nz-rule-strong: #c3d4cc; /* emphasised borders */
+
+  --nz-radius: 8px;
+  --nz-radius-sm: 5px;
+  --nz-shadow-sm: 0 1px 2px rgba(22, 33, 27, 0.06);
+  --nz-shadow: 0 2px 8px rgba(22, 33, 27, 0.08);
+  --nz-shadow-lg: 0 8px 24px rgba(22, 33, 27, 0.12);
+
+  --nz-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --nz-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 /* HL7 New Zealand affiliate logo slot in the page header. project.css styles
@@ -40,7 +73,7 @@
   float: left;
   margin-top: 4px;
   margin-bottom: 4px;
-  color: #808080;
+  color: var(--nz-ink-muted);
 }
 
 #hl7-nav a {

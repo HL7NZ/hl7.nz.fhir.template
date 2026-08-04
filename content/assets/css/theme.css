@@ -1,0 +1,1068 @@
+/* ------------------------------------------------------------------------- *
+ * HL7 New Zealand - refined light theme.
+ *
+ * Loaded last, after fonts.css and hl7nz.css, and after the base template's
+ * project.css / cqf.css. Every colour here comes from a token defined in
+ * hl7nz.css - the HL7 NZ palette itself is unchanged, this file only refines
+ * how it is applied.
+ *
+ * NEVER USE rem UNITS IN THIS FILE
+ * bootstrap-fhir.css sets `html { font-size: 62.5% }`, so 1rem is 10px here,
+ * not 16px. Every size below is px or em deliberately. A rem value looks right
+ * in a browser devtools scratchpad and then renders at 62.5% of its intended
+ * size in the actual IG.
+ *
+ * WHY SO MANY !important RULES
+ * The IG publisher generates artifact pages from Java with colour, font and
+ * spacing baked into inline style attributes (~3000 per profile page). Inline
+ * styles beat class selectors, so anything touching generated markup has to
+ * use !important. Rules that only touch base-template markup do not, and
+ * deliberately don't.
+ *
+ * CONTENTS
+ *   1.  Typography
+ *   2.  Headings and section numbering
+ *   3.  Links and focus
+ *   4.  Page header
+ *   5.  Navbar (sticky) and dropdowns
+ *   6.  Breadcrumb
+ *   7.  Content area
+ *   8.  Footer
+ *   9.  Callouts and boxes
+ *   10. Tabs
+ *   11. Tables - general
+ *   12. Tables - generated element trees  (READ THE WARNING)
+ *   13. Code and pre
+ *   14. Small polish
+ *   15. Print
+ * ------------------------------------------------------------------------- */
+
+
+/* == 1. Typography ======================================================== */
+
+body {
+  font-family: var(--nz-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--nz-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ONE FAMILY EVERYWHERE, except code.
+ *
+ * The base stylesheets hardcode a font-family in several places that a plain
+ * `body { font-family }` never reaches, which is what makes an untreated IG
+ * look like three different sites stitched together:
+ *
+ *   bootstrap-fhir.css  body, h1-h6/.h1-.h6, .navbar-*  -> Helvetica Neue
+ *   project.css         .navbar .nav > li > a           -> Helvetica Neue
+ *   jquery-ui*.css      .ui-widget and its form fields  -> Trebuchet MS
+ *   publisher inline    generated element tree tables   -> verdana
+ *
+ * `body *` is low specificity (0,0,1) on purpose: it sweeps up everything, and
+ * any later or more specific rule - including the mono rules in section 13 -
+ * still wins. It does not match pseudo-elements, so the Glyphicons and
+ * FontAwesome icon fonts are untouched. */
+body,
+body *,
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.navbar .nav > li > a,
+.dropdown-menu li > a,
+.breadcrumb,
+.nav-tabs a,
+.ui-widget,
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button,
+input, button, select, textarea {
+  font-family: var(--nz-sans);
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+ul,
+ol {
+  line-height: 1.65;
+}
+
+/* Prose lists only. Markdown-generated lists carry no class, whereas the
+   navbar, breadcrumb, dropdowns and tabs are all class-bearing <ul>s - a bare
+   `li + li` rule here pushes every nav item down except the first one. */
+#segment-content ul:not([class]) > li + li,
+#segment-content ol:not([class]) > li + li {
+  margin-top: 0.25em;
+}
+
+strong,
+b {
+  font-weight: 600;
+}
+
+small,
+.small {
+  font-size: 0.85em;
+  color: var(--nz-ink-muted);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--nz-rule);
+  margin: 2em 0;
+}
+
+
+/* == 2. Headings and section numbering ==================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title {
+  font-family: var(--nz-sans);
+  font-weight: 600;
+  color: var(--nz-ink);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 32px;
+  margin: 0 0 0.5em;
+}
+
+h2 {
+  font-size: 25px;
+  margin: 1em 0 0.4em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--nz-rule);
+}
+
+h3 {
+  font-size: 20px;
+  margin: 1.15em 0 0.35em;
+}
+
+h4 {
+  font-size: 17px;
+  margin: 1.3em 0 0.35em;
+}
+
+h5,
+h6 {
+  font-size: 15px;
+  margin: 1.4em 0 0.35em;
+  color: var(--nz-ink-muted);
+}
+
+/* project.css prefixes headings with generated section numbers in silver.
+   Keep the numbering, make it quieter and stop it competing with the title. */
+h2:before,
+h3:before,
+h4:before,
+h5:before,
+h6:before {
+  color: var(--nz-ink-faint);
+  font-weight: 500;
+  font-size: 0.8em;
+  letter-spacing: 0;
+}
+
+h1.underlined,
+h2.underlined,
+h3.underlined,
+h4.underlined,
+h5.underlined,
+h6.underlined {
+  border-bottom-color: var(--nz-rule);
+}
+
+
+/* == 3. Links and focus =================================================== */
+
+a {
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+  transition: color 0.12s ease;
+}
+
+a:hover,
+a:focus {
+  text-decoration-color: var(--nz-green-bright);
+}
+
+/* Replace the base template's `outline: thin dotted` with something visible
+   against the green palette, and only show it for keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--nz-green-mid);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+/* == 4. Page header ======================================================= */
+
+#segment-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--nz-rule);
+}
+
+#segment-header > .container {
+  background-color: #ffffff;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-height: 76px;
+}
+
+/* The header children are floated by project.css and appear in DOM order
+   hl7-nav, project-nav, family-nav, ig-status. Flex + order puts the status
+   block in the middle where it belongs, and drops the float layout. */
+#segment-header > .container > div {
+  float: none !important;
+  margin: 0 !important;
+}
+
+#hl7-nav {
+  order: 1;
+}
+
+#project-nav {
+  order: 2;
+}
+
+#ig-status {
+  order: 3;
+  flex: 1 1 auto;
+  height: auto !important;
+  line-height: 1.35 !important;
+  text-align: center;
+  min-width: 200px;
+}
+
+#family-nav {
+  order: 4;
+}
+
+#fcp-nav {
+  order: 5;
+}
+
+#ig-status p {
+  margin: 0;
+}
+
+/* IG title - the publisher sets font-size:12pt;font-weight:bold inline */
+#ig-status p > span:first-child {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  color: var(--ig-status-text-color);
+}
+
+/* Version + status line - the publisher marks this one display:inline-block.
+   Promote it to a pill so the release state reads at a glance. */
+#ig-status p span[style*="inline-block"] {
+  margin-top: 6px;
+  padding: 2px 10px;
+  border: 1px solid var(--nz-rule-strong);
+  border-radius: 999px;
+  background-color: var(--nz-surface);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--nz-ink-muted);
+  white-space: nowrap;
+}
+
+/* Size the header logos in CSS rather than relying on the height="50" attribute
+   in the header fragment, and balance them optically: the HL7 NZ mark is a
+   stacked lockup so it needs more height than the horizontal FHIR mark to read
+   at the same visual weight. */
+#hl7-logo img,
+#family-logo img,
+#project-logo img {
+  display: block;
+  width: auto;
+}
+
+#hl7-logo img {
+  height: 56px;
+}
+
+#project-logo img {
+  height: 44px;
+}
+
+#family-logo img {
+  height: 38px;
+}
+
+@media (max-width: 767px) {
+  #segment-header > .container {
+    gap: 10px;
+  }
+
+  #ig-status {
+    order: 6;
+    flex-basis: 100%;
+    text-align: left;
+  }
+}
+
+
+/* == 5. Navbar (sticky) and dropdowns ===================================== */
+
+/* Keep the menu reachable on long artifact pages. Pure CSS - no scripting. */
+#segment-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  box-shadow: var(--nz-shadow-sm);
+}
+
+/* Thin accent rule rather than the original 8px slab */
+#stripe {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--nz-green-deep) 0%,
+    var(--nz-green-mid) 45%,
+    var(--nz-green-bright) 100%
+  );
+}
+
+.navbar-inverse {
+  border: 0;
+}
+
+.navbar .nav > li > a {
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  border-radius: var(--nz-radius-sm);
+  margin: 4px 2px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: var(--btn-text-color);
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  background-color: var(--btn-hover-color);
+  color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+  background-color: var(--btn-hover-color);
+  color: #ffffff;
+}
+
+.navbar-toggle {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-radius: var(--nz-radius-sm);
+}
+
+.navbar-toggle .icon-bar {
+  background-color: var(--btn-text-color);
+}
+
+/* Flatten the 2012-era vertical gradients on dropdown items. Same colours,
+   applied as a flat fill. */
+.dropdown-menu {
+  border: 1px solid var(--nz-rule);
+  border-radius: var(--nz-radius);
+  box-shadow: var(--nz-shadow-lg);
+  padding: 6px;
+  margin-top: 2px;
+}
+
+.dropdown-menu li > a {
+  padding: 7px 14px;
+  border-radius: var(--nz-radius-sm);
+  font-size: 14px;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus,
+.dropdown-submenu:hover > a,
+.dropdown-submenu:focus > a,
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  background-image: none;
+  filter: none;
+  background-color: var(--btn-gradient-end-color);
+  color: #ffffff;
+}
+
+
+/* == 6. Breadcrumb ======================================================== */
+
+#segment-breadcrumb {
+  border-bottom: 1px solid var(--nz-rule);
+}
+
+.breadcrumb {
+  padding: 9px 0;
+  border-radius: 0;
+  font-size: 13px;
+  color: var(--nz-ink-muted);
+}
+
+.breadcrumb a {
+  color: var(--nz-ink-muted);
+  font-weight: 500;
+}
+
+.breadcrumb a:hover {
+  color: var(--link-color);
+}
+
+.breadcrumb b {
+  font-weight: 500;
+}
+
+.breadcrumb > li + li:before {
+  color: var(--nz-rule-strong);
+  padding: 0 6px;
+}
+
+
+/* == 7. Content area ====================================================== */
+
+#segment-content > .container > .row > .inner-wrapper {
+  margin-top: 8px;
+  margin-bottom: 32px;
+}
+
+/* Hold prose to a comfortable measure without constraining tables, which need
+   the full container width. Direct children only, so nested content in tables
+   and callouts is untouched. */
+#segment-content .inner-wrapper > p,
+#segment-content .inner-wrapper > ul,
+#segment-content .inner-wrapper > ol,
+#segment-content .inner-wrapper > blockquote:not(.stu-note) {
+  max-width: 78ch;
+}
+
+/* The sticky navbar would otherwise cover the target of an in-page anchor. */
+h1[id],
+h2[id],
+h3[id],
+h4[id],
+h5[id],
+h6[id],
+a[name] {
+  scroll-margin-top: 92px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+
+/* == 8. Footer ============================================================ */
+
+#segment-footer {
+  margin-top: 0;
+}
+
+#segment-footer > .container .inner-wrapper {
+  padding: 18px 20px;
+}
+
+#segment-footer > .container .inner-wrapper > p {
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+#segment-footer a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#segment-footer a:hover {
+  text-decoration: underline;
+}
+
+#segment-post-footer {
+  display: none;
+}
+
+
+/* == 9. Callouts and boxes ================================================ */
+
+#publish-box {
+  background-color: var(--publish-box-bg-color);
+  border: 1px solid var(--nz-rule-strong);
+  border-left: 4px solid var(--nz-green-mid);
+  border-radius: var(--nz-radius);
+  padding: 9px 14px;
+  font-size: 15px;
+  box-shadow: var(--nz-shadow-sm);
+}
+
+.note-to-balloters,
+.stu-note,
+blockquote.stu-note {
+  border: 1px solid var(--nz-rule);
+  border-left: 4px solid var(--stu-note-border-left-color);
+  border-radius: var(--nz-radius);
+  padding: 14px 18px;
+  margin: 1.5em 0;
+  box-shadow: var(--nz-shadow-sm);
+}
+
+.stu-note::before,
+.note-to-balloters::before {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+div.markdown-toc {
+  background-color: var(--toc-box-bg-color);
+  border: 1px solid var(--nz-rule-strong);
+  border-radius: var(--nz-radius);
+  padding: 6px 12px;
+}
+
+div.markdown-toc p,
+div.markdown-toc p.link {
+  font-size: 13px;
+}
+
+.dragon {
+  border-radius: var(--nz-radius);
+}
+
+
+/* == 10. Tabs ============================================================= */
+
+/* Two different tab controls appear in an IG, and they are styled to match:
+ *
+ *  - Bootstrap .nav-tabs    - the Content / Detailed Descriptions / Mappings
+ *                             strip near the top of an artifact page.
+ *  - jQuery UI 1.11.1 tabs  - the Key Elements / Differential / Snapshot
+ *                             strip, from <div id="tabs"> plus tabs.js. Its
+ *                             .ui-* classes are added at runtime, which is why
+ *                             they never appear in the generated HTML.
+ *
+ * Both keep the classic raised-tab shape - a real bordered tab that joins the
+ * panel below it - because that shape is what tells a reader the strip is
+ * clickable. Only the colours change: project.css uses a leftover HL7 maroon
+ * (#955159), and jquery-ui.theme.min.css is stock Smoothness (orange #f6a828
+ * bar, blue #1c94c4 labels, orange #eb8f00 active). The active tab is marked
+ * twice over - white fill plus a 2px green top edge - so it does not rely on
+ * colour alone.
+ *
+ * That green top edge is an inset box-shadow rather than a border, so it adds
+ * no height and cannot knock the active tab out of line with its neighbours.
+ */
+
+
+/* --- Bootstrap .nav-tabs -------------------------------------------------- */
+
+.nav-tabs {
+  border-bottom: 1px solid var(--nz-rule) !important;
+  margin-bottom: 24px;
+}
+
+.nav-tabs > li {
+  margin-bottom: -1px;
+}
+
+.nav-tabs > li > a,
+.nav-tabs a {
+  background-color: var(--nz-surface) !important;
+  border: 1px solid var(--nz-rule) !important;
+  border-radius: var(--nz-radius-sm) var(--nz-radius-sm) 0 0;
+  color: var(--nz-ink-muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  margin-right: 3px;
+  padding: 8px 15px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.nav-tabs > li > a:hover,
+.nav-tabs li a:hover,
+.nav-tabs li a:focus {
+  background-color: var(--nz-surface-sunken) !important;
+  border-color: var(--nz-rule-strong) !important;
+  color: var(--nz-ink);
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover,
+.nav-tabs > .active > a:focus {
+  background-color: #ffffff !important;
+  border: 1px solid var(--nz-rule) !important;
+  border-bottom-color: #ffffff !important;
+  box-shadow: inset 0 2px 0 var(--nz-green-mid);
+  color: var(--nz-green-mid) !important;
+  font-weight: 600;
+  cursor: default;
+}
+
+
+/* --- jQuery UI tabs ------------------------------------------------------- */
+
+.ui-tabs {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: inherit; /* .ui-widget sets 1.1em */
+}
+
+.ui-tabs .ui-tabs-nav {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--nz-rule);
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+/* jquery-ui.css already gives li `border-bottom-width: 0`, and gives the active
+   li `margin-bottom: -1px; padding-bottom: 1px`. That pair is what lets the
+   active tab sit over the nav's bottom rule and merge with the panel, so it is
+   left intact deliberately - only fill and border colour are set here. */
+.ui-tabs .ui-tabs-nav li {
+  background: var(--nz-surface);
+  border: 1px solid var(--nz-rule);
+  border-radius: var(--nz-radius-sm) var(--nz-radius-sm) 0 0;
+  margin: 0 3px 0 0;
+  top: 0;
+  transition: background-color 0.12s ease;
+}
+
+/* Keep jQuery UI's `float: left` on the anchor. Without it the anchor is
+   inline, vertical padding is ignored, and the tabs collapse to bare text. */
+.ui-tabs .ui-tabs-nav li a,
+.ui-tabs .ui-tabs-nav li a:link,
+.ui-tabs .ui-tabs-nav li a:visited,
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+  color: var(--nz-ink-muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  padding: 8px 15px;
+  transition: color 0.12s ease;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover,
+.ui-tabs .ui-tabs-nav li.ui-state-focus {
+  background: var(--nz-surface-sunken);
+  border-color: var(--nz-rule-strong);
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover a,
+.ui-tabs .ui-tabs-nav li.ui-state-focus a {
+  color: var(--nz-ink);
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active,
+.ui-tabs .ui-tabs-nav li.ui-state-active {
+  background: #ffffff;
+  border-color: var(--nz-rule);
+  box-shadow: inset 0 2px 0 var(--nz-green-mid);
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a:link,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a:visited,
+.ui-tabs .ui-tabs-nav li.ui-state-active a {
+  color: var(--nz-green-mid);
+  font-weight: 600;
+}
+
+.ui-tabs .ui-tabs-panel {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 20px 0 0;
+  color: inherit;
+}
+
+
+/* == 11. Tables - general ================================================= */
+
+.table,
+table.grid,
+table.codes,
+table.dict,
+table.list {
+  font-size: 14px;
+  border-color: var(--nz-rule);
+}
+
+.table td,
+.table th {
+  padding: 9px 12px;
+  line-height: 1.5;
+  border-color: var(--nz-rule) !important;
+}
+
+.table th,
+table.grid th,
+table.codes th {
+  background-color: var(--nz-surface-sunken);
+  font-weight: 600;
+  color: var(--nz-ink);
+}
+
+.table th.inverted {
+  background-color: var(--nz-green-deep);
+}
+
+/* fhir.css (which sits at the output root, not in assets/css/) puts
+   `border: 1px solid silver` or `1px black solid` on these. Same treatment as
+   the metadata tables below - light hairlines instead. */
+table.grid,
+table.codes {
+  border: 1px solid var(--nz-rule);
+}
+
+table.grid td,
+table.grid th,
+table.codes td,
+table.codes th,
+table.dict td,
+table.list td,
+table.dict td.structure {
+  border-color: var(--nz-rule);
+}
+
+
+/* --- Artifact metadata summary tables ------------------------------------ *
+ *
+ * The Official URL / Version / Status block at the top of artifact pages, and
+ * the same table on the IG home page.
+ *
+ * fhir.css sets `border: 1px grey solid` AND the artifact-status tint on every
+ * *cell*, not on the table. Two consequences: a heavy grey grid, and cell
+ * backgrounds painting over the table's rounded corners. So move the tint to
+ * the table and reduce the cell borders to internal hairlines - no cell
+ * borders at all on the outer edges, which is what lets the radius clip.
+ *
+ * The tint values are carried over from fhir.css unchanged. They encode
+ * artifact standards-status and are a FHIR-wide convention, not HL7 NZ colour,
+ * which is why they are literal hex here rather than palette tokens.
+ * ------------------------------------------------------------------------- */
+
+table.colstu,
+table.colsd,
+table.colsn,
+table.colse,
+table.colsi,
+table.colsdp {
+  width: 100%;
+  border: 1px solid var(--nz-rule);
+  border-radius: var(--nz-radius);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+table.colstu { background-color: #fff5e6; }
+table.colsd  { background-color: #efefef; }
+table.colsn  { background-color: #e6ffe6; }
+table.colse  { background-color: #e6e6e6; }
+table.colsi  { background-color: #ffffe6; }
+table.colsdp { background-color: #ffcccc; }
+
+table.colstu td,
+table.colsd td,
+table.colsn td,
+table.colse td,
+table.colsi td,
+table.colsdp td {
+  background-color: transparent;
+  border: 0;
+  border-top: 1px solid var(--nz-rule);
+  border-left: 1px solid var(--nz-rule);
+  padding: 9px 14px;
+}
+
+table.colstu tr:first-child td,
+table.colsd tr:first-child td,
+table.colsn tr:first-child td,
+table.colse tr:first-child td,
+table.colsi tr:first-child td,
+table.colsdp tr:first-child td {
+  border-top: 0;
+}
+
+table.colstu td:first-child,
+table.colsd td:first-child,
+table.colsn td:first-child,
+table.colse td:first-child,
+table.colsi td:first-child,
+table.colsdp td:first-child {
+  border-left: 0;
+}
+
+/* The "Official URL", "Version", "Computable Name" labels */
+table.colstu i,
+table.colsd i,
+table.colsn i,
+table.colse i,
+table.colsi i,
+table.colsdp i {
+  color: var(--nz-ink-muted);
+  font-style: normal;
+  font-weight: 500;
+}
+
+
+/* == 12. Tables - generated element trees ================================= *
+ *
+ * The Key Elements / Differential / Snapshot trees.
+ *
+ * ON THE WOBBLY TREE LINES
+ * The vertical run-through lines are `background-image: url(tbl_bckNN.png)` -
+ * an 800x2 tile carrying a single black pixel, so the line is a dot every 2px,
+ * and tiling restarts at the top of each cell's padding box. Whenever a row's
+ * height is not an even whole number of *device* pixels the next row's dots
+ * land out of phase and the line reads as wobbly.
+ *
+ * That happens at fractional browser zoom no matter what the CSS says, and it
+ * happens in the untreated publisher output too - verified against the
+ * published IG, which is clean at 100% and 200% and wobbles at other zooms. It
+ * is not something a stylesheet can fix, so it is not worth contorting the
+ * theme to chase. Poppins stays.
+ *
+ * WHAT IS STILL GENUINELY BREAKABLE HERE
+ * Horizontal padding. Background origin is the padding box, so padding does
+ * NOT move the run-through lines - but the per-cell connectors
+ * (tbl_spacer.png, tbl_vjoin.png, tbl_vline.png) are 22px <img> elements in
+ * the cell's *content* box, and padding slides those sideways. Change
+ * padding-left here and the tree visibly jogs left/right row to row at every
+ * zoom level. The publisher's `padding: 0px 4px` is therefore left alone.
+ *
+ * Row height is pinned to a flat 22px - the height the connector art is drawn
+ * for - rather than being left to fall out of the font's ascender and the
+ * inherited line-height. That is what makes the font swap safe: an unpinned
+ * row lands somewhere around 26.6px with Poppins, and the pin also stops body
+ * line-height changes from silently altering the trees later.
+ *
+ * The connector art is transparent PNG with black line work, so recolouring
+ * the cell background is entirely safe - the lines show through unchanged.
+ * ------------------------------------------------------------------------- */
+
+table[data-fhir="generated-heirarchy"],
+table[fhir="generated-heirarchy"] {
+  font-family: var(--nz-sans) !important;
+  font-size: 11px !important; /* the publisher's own size - do not raise */
+  box-shadow: 0 0 0 1px var(--nz-rule);
+  border-radius: var(--nz-radius-sm);
+  margin-bottom: 20px;
+}
+
+/* Pin the row to exactly the 22px the connector art is drawn for, instead of
+   inheriting body's 1.65 line-height. Top-aligning the images holds the line
+   box at 22px regardless of the font's descent - they sit at the top of the
+   cell either way, so this changes the row height without moving the art. */
+td.hierarchy {
+  line-height: 22px !important;
+}
+
+td.hierarchy img.hierarchy,
+th.hierarchy img.hierarchy {
+  vertical-align: top !important;
+}
+
+/* Map the publisher's two hardcoded row colours onto the palette. Matching on
+   the inline style keeps the publisher's own striping semantics intact rather
+   than re-striping with :nth-child, which would drift if the generator
+   changes. */
+td.hierarchy[style*="background-color: white"] {
+  background-color: #ffffff !important;
+}
+
+td.hierarchy[style*="background-color: #F7F7F7"] {
+  background-color: var(--nz-surface) !important;
+}
+
+/* Colour only - the publisher's `padding: 0px 4px` is deliberately untouched,
+   see the warning above. */
+td.hierarchy,
+th.hierarchy {
+  border-color: var(--nz-rule) !important;
+}
+
+th.hierarchy {
+  background-color: var(--nz-surface-sunken) !important;
+  border-bottom: 1px solid var(--nz-rule-strong) !important;
+  font-weight: 600 !important;
+  color: var(--nz-ink) !important;
+}
+
+th.hierarchy a {
+  color: var(--nz-ink) !important;
+}
+
+
+/* == 13. Code and pre ===================================================== */
+
+/* The single exception to "one family everywhere". prism.css claims the
+   highlighted blocks at higher specificity than a bare `pre`, so those
+   selectors are listed explicitly - otherwise JSON/XML examples render in
+   Consolas while every other pre renders in the stack below. */
+pre,
+code,
+kbd,
+samp,
+.copy-text,
+code[class*="language-"],
+pre[class*="language-"],
+span[style*="font-family: monospace"] {
+  font-family: var(--nz-mono) !important;
+}
+
+pre {
+  font-size: 12.5px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  background-color: var(--nz-surface);
+  border: 1px solid var(--nz-rule);
+  border-radius: var(--nz-radius);
+  overflow-x: auto;
+}
+
+/* cqf.css gives the syntax-highlighted blocks their own borders */
+pre.json,
+pre.xml,
+pre.rdf {
+  border: 1px solid var(--nz-rule);
+  border-left: 4px solid var(--nz-green-mid);
+  border-radius: var(--nz-radius);
+  background-color: var(--nz-surface);
+}
+
+code {
+  font-size: 0.88em;
+  padding: 0.15em 0.4em;
+  background-color: var(--nz-surface);
+  border: 1px solid var(--nz-rule);
+  border-radius: 4px;
+  color: var(--nz-ink);
+}
+
+pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+}
+
+.copy-text {
+  font-weight: 400;
+  font-size: 0.9em;
+}
+
+
+/* == 14. Small polish ===================================================== */
+
+::selection {
+  background-color: var(--nz-green-pale);
+  color: var(--nz-ink);
+}
+
+html {
+  scrollbar-color: var(--nz-rule-strong) transparent;
+}
+
+/* anchor.js heading links added by the base template's anchor-hover.js */
+.anchorjs-link {
+  color: var(--nz-green-mid) !important;
+  text-decoration: none !important;
+  opacity: 0.55;
+}
+
+.anchorjs-link:hover {
+  opacity: 1;
+}
+
+/* Scoped to content only, and deliberately without `height: auto`. A stylesheet
+   rule beats the presentational height="" attribute, which is how the header
+   fragment sizes the logos - a global `height: auto` renders them at full
+   natural size (the HL7 NZ mark is 1014x568). Header logos are sized in CSS
+   above instead, so neither mechanism can be undercut by the other. */
+#segment-content img {
+  max-width: 100%;
+}
+
+/* project.css floats every image inside a paragraph; keep that, but stop
+   diagrams colliding with the text that follows. */
+#segment-content p > img {
+  margin-bottom: 14px;
+}
+
+.btn-copy {
+  opacity: 0.5;
+}
+
+.copy-text:hover .btn-copy {
+  opacity: 1;
+}
+
+.bg-success,
+.bg-info,
+.bg-warning,
+.bg-danger {
+  border-radius: var(--nz-radius-sm);
+  padding: 2px 6px;
+}
+
+
+/* == 15. Print ============================================================ */
+
+@media print {
+  #segment-navbar,
+  #segment-breadcrumb,
+  #segment-footer,
+  #segment-post-footer {
+    display: none !important;
+  }
+
+  #segment-header {
+    border-bottom: 1px solid var(--nz-rule);
+  }
+
+  body {
+    font-size: 11pt;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
