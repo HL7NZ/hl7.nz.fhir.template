@@ -223,10 +223,10 @@ a:focus:not(:focus-visible) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  min-height: 76px;
+  gap: 12px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: 52px;
 }
 
 /* The header children are floated by project.css and appear in DOM order
@@ -249,7 +249,7 @@ a:focus:not(:focus-visible) {
   order: 3;
   flex: 1 1 auto;
   height: auto !important;
-  line-height: 1.35 !important;
+  line-height: 1.3 !important;
   text-align: center;
   min-width: 200px;
 }
@@ -268,7 +268,7 @@ a:focus:not(:focus-visible) {
 
 /* IG title - the publisher sets font-size:12pt;font-weight:bold inline */
 #ig-status p > span:first-child {
-  font-size: 18px !important;
+  font-size: 15px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em;
   color: var(--ig-status-text-color);
@@ -277,12 +277,12 @@ a:focus:not(:focus-visible) {
 /* Version + status line - the publisher marks this one display:inline-block.
    Promote it to a pill so the release state reads at a glance. */
 #ig-status p span[style*="inline-block"] {
-  margin-top: 6px;
-  padding: 2px 10px;
+  margin-top: 2px;
+  padding: 1px 8px;
   border: 1px solid var(--nz-rule-strong);
   border-radius: 999px;
   background-color: var(--nz-surface);
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--nz-ink-muted);
   white-space: nowrap;
@@ -300,15 +300,15 @@ a:focus:not(:focus-visible) {
 }
 
 #hl7-logo img {
-  height: 56px;
+  height: 40px;
 }
 
 #project-logo img {
-  height: 44px;
+  height: 32px;
 }
 
 #family-logo img {
-  height: 38px;
+  height: 28px;
 }
 
 @media (max-width: 767px) {
@@ -349,13 +349,20 @@ a:focus:not(:focus-visible) {
   border: 0;
 }
 
+/* bootstrap-fhir.css floors .navbar at min-height: 40px, which would stop
+   the link padding below from having any effect. Let the content size it. */
+.navbar {
+  min-height: 0;
+}
+
 .navbar .nav > li > a {
-  padding: 11px 14px;
+  padding: 10px 14px;
   font-size: 15px;
   font-weight: 500;
+  line-height: 1.25;
   letter-spacing: 0.005em;
   border-radius: var(--nz-radius-sm);
-  margin: 4px 2px;
+  margin: 2px 2px;
   transition: background-color 0.12s ease, color 0.12s ease;
 }
 
@@ -422,9 +429,15 @@ a:focus:not(:focus-visible) {
 }
 
 .breadcrumb {
-  padding: 9px 0;
+  /* Asymmetric on purpose. Bootstrap makes the crumbs `display: inline-block`,
+     so each one's box bottom sits on the baseline and the parent's descender
+     space - about 4px at 13px/1.4 - is left as dead air below them. Equal
+     padding therefore renders top-heavy; taking 4px off the bottom is what
+     makes the text look vertically centred. */
+  padding: 6px 0 2px;
   border-radius: 0;
   font-size: 13px;
+  line-height: 1.4;
   color: var(--nz-ink-muted);
 }
 
@@ -519,7 +532,7 @@ a[name] {
   border-left: 4px solid var(--nz-green-mid);
   border-radius: var(--nz-radius);
   padding: 9px 14px;
-  font-size: 15px;
+  font-size: 12px;
   box-shadow: var(--nz-shadow-sm);
 }
 
@@ -933,12 +946,28 @@ th.hierarchy a {
 
 /* == 13. Code and pre ===================================================== */
 
-/* The single exception to "one family everywhere". prism.css claims the
-   highlighted blocks at higher specificity than a bare `pre`, so those
-   selectors are listed explicitly - otherwise JSON/XML examples render in
-   Consolas while every other pre renders in the stack below. */
+/* The single exception to "one family everywhere".
+ *
+ * `pre *` and `code *` are the load-bearing part. The publisher renders the
+ * XML / JSON / TTL tabs on ValueSets, CodeSystems, NamingSystems and example
+ * instances as:
+ *
+ *     <pre class="json"><code class="language-json">{
+ *       "<a href="...">resourceType</a>" : "ValueSet",
+ *
+ * so every property name is an <a> element. The `body *` sweep in section 1
+ * sets the sans family directly on those anchors, which means they never
+ * inherit monospace from the enclosing <code> - the keys came out proportional
+ * while the values stayed monospace. Matching descendants explicitly fixes it.
+ *
+ * prism.css is also listed explicitly because it claims the highlighted blocks
+ * at higher specificity than a bare `pre`; without those two selectors,
+ * highlighted examples render in Consolas while every other pre uses the stack
+ * below. */
 pre,
+pre *,
 code,
+code *,
 kbd,
 samp,
 .copy-text,
@@ -966,6 +995,14 @@ pre.rdf {
   border-left: 4px solid var(--nz-green-mid);
   border-radius: var(--nz-radius);
   background-color: var(--nz-surface);
+}
+
+/* The publisher emits the TTL tab with an inline `overflow: hidden`, which
+   beats the `overflow-x: auto` on `pre` above and clips long Turtle lines with
+   no way to reach them. The JSON and XML tabs use `text-wrap: nowrap` instead
+   and scroll normally, so this is only needed for .rdf. */
+pre.rdf {
+  overflow-x: auto !important;
 }
 
 code {
