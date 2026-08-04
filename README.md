@@ -31,7 +31,7 @@ To pin a published version instead, use `template = hl7.nz.fhir.template#0.1.0`.
 | `package-list.json` | Publication history for the template package |
 | `includes/_append.fragment-css.html` | Appended to the base template's `fragment-css.html`; links `hl7nz.css` |
 | `includes/_append.fragment-header.html` | Appended to the base template's `fragment-header.html`; HL7 NZ and FHIR logos |
-| `includes/_append.fragment-footer.html` | Appended to the base template's `fragment-footer.html`; HL7 NZ link |
+| `includes/_append.fragment-footer.html` | Appended to the base template's `fragment-footer.html`; Version History and HL7 NZ links |
 | `content/assets/css/hl7nz.css` | HL7 NZ theme — overrides the standard theming custom properties |
 | `content/assets/images/` | HL7 NZ and FHIR logos |
 
