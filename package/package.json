@@ -1,0 +1,13 @@
+{
+  "name" : "hl7.nz.fhir.template",
+  "type" : "fhir.template",
+  "license" : "CC0-1.0",
+  "description" : "HL7 New Zealand template for use with HL7 New Zealand-published FHIR implementation guides",
+  "author" : "HL7 New Zealand",
+  "canonical" : "http://fhir.org.nz/templates/hl7.nz.fhir.template",
+  "base" : "fhir.base.template",
+  "dependencies" : {
+    "fhir.base.template" : "current"
+  },
+  "version" : "0.1.0"
+}
