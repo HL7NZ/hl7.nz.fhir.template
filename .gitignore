@@ -2,3 +2,8 @@
 /temp
 /template
 /input-cache
+
+# written into the template folder by the publisher when it is referenced
+# as a local directory rather than by URL
+.index.json
+.index.db
